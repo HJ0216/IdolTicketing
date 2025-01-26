@@ -57,6 +57,7 @@ public class UserService {
   }
 
   @Cacheable(cacheNames = CACHE1, key = "'users:' + #id")
+  // cacheNames: 캐시를 구분하고 각각의 캐시에 대해 커스터마이징된 설정을 적용하기 위해 사용
   public User getUser3(final Long id) {
     return userRepository.findById(id).orElseThrow();
   }
