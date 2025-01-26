@@ -35,12 +35,26 @@
 
 
 ## 2. Cache
+* Cache
+  * 자주 사용하는 데이터나 값을 미리 복사해 놓는 임시 장소
+  * Caching Strategy  
+  ![caching-strategy](https://github.com/user-attachments/assets/b3e7d9a9-dc6a-47a8-9270-cceea685d58e)
+    * Spring에서 Redis를 활용한 Caching Strategy 종류
+      * RedisConfig - userRedisTemplate: 객체별로 Redis Template 작성
+      * RedisConfig - objectRedisTemplate: 다형성을 활용하여 Redis Template 공유
+      * @RedisHash: 객체를 Redis의 Hash 데이터 구조로 저장
+        * CrudRepository / RedisRepository를 상속하는 Repository 이용 필수
+      * @Cacheable + CacheConfig
+        * 캐시에 데이터가 없을 경우 → 캐시에 데이터 추가
+        * 캐시에 데이터가 있을 경우 → 캐시의 데이터 반환 
+        * @CacheEvict: 캐시된 데이터를 삭제하는 데 사용
+        * @CachePut: 캐시된 데이터를 갱신할 때 사용
 
 
 
 ## 3. Webflux
 
-
+ 
 
 ## 4. 접속자 대기 시스템 개발
 
