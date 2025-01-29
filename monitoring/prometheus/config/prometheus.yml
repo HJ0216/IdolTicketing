@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 1m 
+  #모든 스크래핑 기본 간격 설정
+  #기본적으로 1분마다(targets에서 지정한 서버에서) 데이터를 수집
+
+scrape_configs: #스크래핑 대상 정의
+  - job_name: 'prometheus'
+    scrape_interval: 1m
+    # scrape_configs.scrape_interval이 global.scrape_interval보다 우선 적용
+    static_configs: #고정된 타겟 리스트
+      - targets: ['localhost:9090'] #Prometheus 자체를 스크래핑
+
+  - job_name: 'redis-exporter'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['redis-exporter:9121'] #Redis Exporter에서 메트릭 수집

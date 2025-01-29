@@ -1,0 +1,75 @@
+version: '3.8' #Docker Compose 파일 버전
+networks: #네트워크 설정으로, 서비스 간 통신을 가능하게 함
+  monitor:
+    driver: bridge #네트워크 드라이버로 bridge를 사용
+
+services: #services 아래에 실행할 컨테이너를 정의
+  redis:
+    container_name: redis #container 이름 지정
+    image: redis:6.2 #Image 지정
+    ports: #port 매핑
+      - 6379:6379
+    networks:
+      - monitor
+      #연결할 네트워크
+      #Docker 네트워크는 컨테이너 간의 통신을 가능하게 하는 가상의 네트워크
+      #docker-compose.yml에서 networks를 정의하고, 각 컨테이너가 이를 사용하도록 설정하면 같은 네트워크를 공유하는 컨테이너끼리 이름(container_name)을 통해 접근할 수 있음
+      #예: redis://redis:6379
+    restart: #컨테이너 중단 시, 동작 설정
+      always
+
+  prometheus: #모니터링 및 경보 시스템
+    image: prom/prometheus:latest
+    user: root
+    volumes: 
+    #호스트(내 컴퓨터)와 Docker 컨테이너의 특정 폴더를 연결하는 설정
+    #컨테이너 내부에서 생성된 파일이 호스트에 저장되거나, 호스트의 파일이 컨테이너에서 사용될 수 있게 됨
+    #데이터를 영구적으로 저장하거나 공유하기 위해 사용
+    #volumes를 통해 데이터를 외부(호스트)에 저장하면 컨테이너를 삭제해도 데이터가 보존
+      - ./prometheus/config:/etc/prometheus 
+      #호스트의 ./prometheus/config에 있는 설정 파일이 컨테이너 내부에서 사용
+      #컨테이너 내부에서 설정을 수정하면 그 내용이 호스트의 ./prometheus/config에 그대로 저장
+      - ./prometheus/data:/prometheus
+      #호스트의 폴더 ./prometheus/data → 컨테이너 내부의 폴더 /prometheus와 연결
+      #Prometheus가 수집한 데이터가 컨테이너 내부의 /prometheus에 저장되는데, 이 데이터가 호스트의 ./prometheus/data에 동기화
+      #컨테이너를 삭제해도 데이터는 호스트의 ./prometheus/data 폴더에 남아 있음
+    #요약: Prometheus의 설정 파일과 데이터를 호스트의 특정 폴더에 저장하고 컨테이너가 이를 읽고 쓰도록 연결하는 작업
+    ports:
+      - 9090:9090
+    networks:
+      - monitor
+    restart: always
+
+
+  grafana: #Prometheus의 데이터를 시각화해주는 툴
+    container_name: grafana
+    image: grafana/grafana:latest
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin #관리자 ID를 admin으로 설정
+      - GF_SECURITY_ADMIN_PASSWORD=password #비밀번호를 password로 지정
+      - GF_USERS_ALLOW_SIGN_UP=false #사용자가 직접 가입하지 못하도록 설정
+    volumes:
+      - ./grafana/data:/var/lib/grafana #Grafana 데이터 저장소
+      - ./grafana/provisioning:/etc/grafana/provisioning #Grafana의 초기 설정 파일들이 들어 있는 디렉터리
+    ports:
+      - 3000:3000
+    depends_on: #Prometheus가 먼저 실행되어야 함
+      - prometheus
+    networks:
+      - monitor
+    restart: always
+
+  redis-exporter: #Redis 데이터를 Prometheus에 전송해주는 툴
+    container_name: redis-exporter
+    image: oliver006/redis_exporter:latest
+    environment:
+      - REDIS_ADDR=redis://redis:6379 #Redis 컨테이너와 연결
+      #redis:// Redis 프로토콜(통신 방식)
+      #redis Redis 컨테이너의 이름 (DNS처럼 사용)
+    ports:
+      - 9121:9121
+    depends_on:
+      - prometheus #Prometheus가 먼저 실행되어야 함
+    networks:
+      - monitor
+    restart: always
