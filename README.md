@@ -33,8 +33,7 @@
     * 로그 및 실시간 분석: Stream과 같은 자료 구조를 활용하여 실시간 데이터 처리
 
 
-
-## 2. Cache
+### 1-1. Cache
 * Cache
   * 자주 사용하는 데이터나 값을 미리 복사해 놓는 임시 장소
   * Caching Strategy  
@@ -51,8 +50,13 @@
         * @CachePut: 캐시된 데이터를 갱신할 때 사용
 
 
+### 1-2. Monitoring
 
-## 3. Webflux
+
+### 1-3. Replication
+
+
+## 2. Webflux
 
  
 
