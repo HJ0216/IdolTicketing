@@ -68,13 +68,27 @@
 
 
 ### 1-3. Replication
+* Replication
+  *  master-slave 아키텍처를 사용하여 master 데이터를 실시간으로 여러 slave 서버에 비동기 복제
+  * 필요성
+    * 안정성  
+     데이터 손실 방지 및 master 서버 장애 발생 시, slave 서버를 데이터가 유지
+    * 가용성  
+      master 서버가 다운되더라도 slave 서버를 통해 읽기 작업을 처리
+      * Failover  
+        기존 master 중단 후, slave 중 하나가 master 승격  
+        → 기존 master 재시작 시에도 slave 역할로 동작  
+        → 데이터 일관성을 유지(master를 대리했던 slave가 새로운 정보를 Write 했을 가능성이 존재)
+    * 읽기 부하 분산  
+      여러 개의 slave 서버를 운영하여 읽기 부하를 분산하여 성능 개선 및 대규모 트래픽 처리 가능
+
 
 
 ## 2. Webflux
 
  
 
-## 4. 접속자 대기 시스템 개발
+## 3. 접속자 대기 시스템 개발
 
 
 
