@@ -1,0 +1,48 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.2'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// r2dbc 설정
+	implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc' // JDBC 대신 비동기 방식으로 DB와 통신할 수 있도록 지원
+	implementation 'io.asyncer:r2dbc-mysql:1.0.2' // R2DBC를 이용해 MySQL과 연결하기 위한 드라이버
+	// 비동기/리액티브 방식으로 MySQL과 데이터를 주고받을 수 있도록 하는 설정
+	// 리액티브(Reactive) 방식: 비동기(Asynchronous) + 논블로킹(Non-blocking) 프로그래밍 모델
+
+	// Reactive Redis 설정
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
