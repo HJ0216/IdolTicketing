@@ -6,7 +6,9 @@ import static org.mockito.Mockito.when;
 import com.example.webflux1.dto.UserCreateRequest;
 import com.example.webflux1.dto.UserResponse;
 import com.example.webflux1.repository.User;
+import com.example.webflux1.service.PostR2dbcService;
 import com.example.webflux1.service.UserService;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,12 +18,21 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.blockhound.BlockHound;
+import reactor.blockhound.BlockingOperationError;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
 @WebFluxTest(controllers = UserController.class)
 @AutoConfigureWebTestClient
 class UserControllerTest {
+  static {
+      BlockHound.install(builder ->
+          builder.allowBlockingCallsInside(UserControllerTest.class.getName(), "allowedBlockingMethod")
+      );
+  }
+
   @Autowired
   private WebTestClient client;
 
@@ -30,6 +41,45 @@ class UserControllerTest {
 
   @MockitoBean // 가짜 객체(Mock) 생성
   private UserService userService;
+
+  @MockitoBean // 가짜 객체(Mock) 생성
+  private PostR2dbcService postR2dbcService;
+
+  @Test
+  void shouldDetectBlockingCall() {
+    Mono<Long> blockingMono = Mono.delay(Duration.ofSeconds(1))
+                                  .doOnNext(t -> {
+                                    try {
+                                      Thread.sleep(100);  // 블로킹 호출
+                                    } catch (InterruptedException e) {
+                                      throw new RuntimeException(e);
+                                    }
+                                  });
+
+    StepVerifier.create(blockingMono)
+                .expectError(BlockingOperationError.class) // 에러 타입을 검증
+                .verify();
+  }
+
+  // 1️⃣ 블로킹 호출을 별도 메서드로 분리
+  void allowedBlockingMethod() {
+    try {
+      Thread.sleep(100);  // 블로킹 호출
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  // 2️⃣ 분리한 메서드를 호출
+  @Test
+  void shouldAllowBlockingCallInsideAllowedMethod() {
+    Mono<Long> allowedMono = Mono.delay(Duration.ofSeconds(1))
+                                     .doOnNext(__ -> allowedBlockingMethod());
+
+    StepVerifier.create(allowedMono)
+                .expectNextCount(1) // Mono.delay(Duration.ofSeconds(1))는 1초 후에 0L이라는 값을 방출
+                .verifyComplete();
+  }
 
   @Test
   void createUser() {
@@ -128,6 +178,7 @@ class UserControllerTest {
   @Test
   @DisplayName("R2DBC")
   void deleteUserById() {
+    when(userService.findById(1L)).thenReturn(Mono.just(new User()));
     when(userService.deleteById(1L)).thenReturn(
         Mono.empty()
     );

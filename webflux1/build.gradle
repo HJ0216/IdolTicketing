@@ -36,13 +36,26 @@ dependencies {
 	// Reactive Redis 설정
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
 
+	// BlockHound(직접 작성한 코드를 포함하여 JDK, Thrid-party 라이브러리에 사용된 블로킹 메소드 호출을 모두 찾아내서 알려주는 자바 에이전트) 설정
+//	implementation 'io.projectreactor.tools:blockhound:1.0.10.RELEASE'
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
+	testImplementation 'io.projectreactor.tools:blockhound:1.0.10.RELEASE'
+
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.withType(Test).all{
+	if(JavaVersion.current().isCompatibleWith(JavaVersion.VERSION_13)){
+		jvmArgs+= [
+		        "-XX:+AllowRedefinitionToAddDeleteMethods"
+		]
+	}
 }
