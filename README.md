@@ -1,5 +1,6 @@
 # 데이터 베이스 최적화를 통한 대용량 트래픽 처리
-**📺강의:** ***[아이돌 티켓팅 접속자 대기열 시스템](https://fastcampus.co.kr/dev_online_traffic_data)***
+**📺강의:** ***[아이돌 티켓팅 접속자 대기열 시스템](https://fastcampus.co.kr/dev_online_traffic_data)***  
+**📑블로그:** ***[아이돌 티켓팅 접속자 대기열 시스템](https://hj0216.tistory.com/category/MinimiProject/%EC%95%84%EC%9D%B4%EB%8F%8C%20%ED%8B%B0%EC%BC%93%ED%8C%85%20%EC%A0%91%EC%86%8D%EC%9E%90%20%EB%8C%80%EA%B8%B0%EC%97%B4%20%EC%8B%9C%EC%8A%A4%ED%85%9C)***
 
 ## 학습 목표
 다량의 요청이 짧은 시간 내에 유입되었을 때, 대기열을 통해 관리하여 장애를 회피하는 방안 습득
