@@ -85,11 +85,43 @@
 
 
 
-## 2. Webflux
-
+## 2. Spring Webflux
+* Spring Webflux
+  * 비동기 논블로킹 방식의 Reactive Programming을 지원하는 Spring Framework의 모듈
+  * Reactor(Core) 라이브러리의 Flux와 Mono를 활용하여 데이터를 비동기 스트림으로 처리
+  * 특징
+    * 비동기/논블로킹: 요청과 응답이 독립적으로 처리
+    * 리액티브 스트림 기반: Publisher-Subscriber 패턴 활용
+      * Publisher: 데이터를 한 번에 다 주는 게 아니라 필요할 때마다 Mono<T>, Flux<T> 형태로 제공
+      * Subscriber: Publisher로부터 데이터를 비동기적으로 받아서 처리
+    * Netty, Undertow, Tomcat 등 지원
+    * Backpressure 지원: Publisher가 끊임없이 emit하는 무수히 많은 데이터를 적절하게 제어하여 데이터 처리에 과부하가 걸리지 않도록 제어
+    * WebFlux는 높은 동시성을 제공하지만, 단순한 CRUD API에서는 MVC보다 성능이 낮을 수 있음 (스레드 컨텍스트 스위칭 비용 발생)
+    * 실시간 데이터 처리(예: 채팅, IoT)에 주로 사용
+* Spring MVC
+  * 서블릿 기반의 동기 요청-응답 처리 모델  
+  각 요청이 서블릿 스레드 풀에서 하나의 스레드를 점유하며, 응답이 완료될 때까지 해당 스레드는 블로킹됨
+  * 특징
+    * 동기식 처리: 요청과 응답이 1:1로 매핑되어 순차적으로 처리
+    * Tomcat (Servlet 기반) 지원
+    * Servlet API 기반: DispatcherServlet을 중심으로 작동
+    * 전통적인 REST API와 CRUD 시스템에서 주로 사용
  
+ <br/>
+
+**Spring WebFlux vs Spring MVC 비교**
+
+| 항목                | Spring WebFlux                  | Spring MVC                    |
+|---------------------|---------------------------------|------------------------------|
+| **요청 처리 방식**   | 비동기/논블로킹                  | 동기/블로킹                    |
+| **멀티스레드 모델**  | 이벤트 루프 기반                 | 서블릿 스레드 풀 기반           |
+| **데이터 처리 방식** | 리액티브 스트림 (`Flux`, `Mono`) | 일반적인 `List`, `Map` 반환    |
+| **적합한 사용 사례** | 실시간 데이터, 스트리밍, IoT 등   | CRUD 서비스, 전통적인 REST API |
+| **서버 엔진**       | Netty, Tomcat (Reactive 기반)    | Tomcat, Jetty (Servlet 기반)  |
+| **Backpressure**    | O                               | X                             |
 
 ## 3. 접속자 대기 시스템 개발
+### 3-1. 요구사항 분석
 
 
 
@@ -102,4 +134,5 @@
 [[Memory] cache란? 캐시(cache)의 동작원리, 캐싱전략(caching strategies)](https://joyhong-91.tistory.com/26)  
 [프로메테우스(소프트웨어)](https://en.wikipedia.org/wiki/Prometheus_(software))  
 [오픈소스 모니터링 시스템 Prometheus #1](https://blog.outsider.ne.kr/1254)  
-[Grafana란?](https://medium.com/finda-tech/grafana%EB%9E%80-f3c7c1551c38)
+[Grafana란?](https://medium.com/finda-tech/grafana%EB%9E%80-f3c7c1551c38)  
+[[리액티브 프로그래밍] Backpressure의 개념과 Backpressure 전략](https://devfunny.tistory.com/914)
