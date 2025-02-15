@@ -15,6 +15,7 @@ public class UserQueueService {
   // 중복된 String이 자주 사용될 경우, 상수 활용
   private final String USER_QUEUE_WAIT_KEY = "users:queue:%s:wait";
   // %s: queue를 여러 개 운용할 경우에 대비
+  private final String USER_QUEUE_PROCEED_KEY = "users:queue:%s:proceed";
 
   // 대기열 등록 API
   public Mono<Long> registerWaitQueue(final String queue, final Long userId) {
@@ -29,5 +30,22 @@ public class UserQueueService {
         .flatMap(isAdded -> reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), userId.toString()))
         .map(rank -> rank >= 0 ? rank + 1 : rank); // 등록된 회원은 true를 반환
   }
+
+  // 진입 허용 API
+  public Mono<Long> allowUser(final String queue, final Long count) {
+    // 1. wait queue에서 사용자 제거
+    // 2. proceed queue에 사용자 추가
+    return reactiveRedisTemplate.opsForZSet().popMin(USER_QUEUE_WAIT_KEY.formatted(queue), count)
+        .flatMap(user -> reactiveRedisTemplate.opsForZSet().add(USER_QUEUE_PROCEED_KEY.formatted(queue), user.getValue(), Instant.now().getEpochSecond()))
+        .count();
+  }
+
+  // 진입 가능 여부 조회 API
+  public Mono<Boolean> isAllowed(final String queue, final Long userId) {
+    return reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_PROCEED_KEY.formatted(queue), userId.toString())
+                                .defaultIfEmpty(-1L)
+                                .map(rank -> rank >= 0);
+  }
+
 
 }
