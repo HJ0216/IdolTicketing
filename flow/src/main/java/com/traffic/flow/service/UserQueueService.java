@@ -1,6 +1,9 @@
 package com.traffic.flow.service;
 
 import com.traffic.flow.exception.ErrorCode;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,11 +61,42 @@ public class UserQueueService {
                                 .map(rank -> rank >= 0);
   }
 
+  public Mono<Boolean> isAllowedByToken(final String queue, final Long userId, final String token) {
+    return this.generateToken(queue, userId)
+        .filter(gen -> gen.equalsIgnoreCase(token))
+        .map(i -> true)
+        .defaultIfEmpty(false);
+  }
+
   // 대기번호 조회 API
   public Mono<Long> getRank(final String queue, final Long userId) {
     return reactiveRedisTemplate.opsForZSet().rank(USER_QUEUE_WAIT_KEY.formatted(queue), userId.toString())
         .defaultIfEmpty(-1L)
         .map(rank -> rank >= 0 ? rank + 1 : rank);
+  }
+  
+  public Mono<String> generateToken(final String queue, final Long userId){
+    MessageDigest digest = null;
+    try {
+      digest = MessageDigest.getInstance("SHA-256");
+    } catch (NoSuchAlgorithmException e) {
+      throw new RuntimeException(e);
+    }
+
+    String input = "user-queue-%s-%d".formatted(queue, userId);
+    byte[] encodedHash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+
+    StringBuilder hexString = new StringBuilder();
+    for (byte b : encodedHash) {
+      hexString.append(String.format("%02x", b));
+      // %x → 정수를 16진수(헥사) 로 변환
+      // 02 → 최소 2자리로 표시하며, 숫자가 1자리면 앞에 0을 추가
+    }
+    return Mono.just(hexString.toString());
+
+    // 토큰을 쿠키에 저장하면, 유저가 다시 요청을 보낼 때 서버가 대기열 상태를 기억할 수 있음
+    // (대기열에 속한 유저가 웹을 새로고침해도 계속 대기열에 있는 상태를 유지할 수 있도록 하는 역할)
+    // 쿠키를 저장하지 않으면 동일한 유저가 대기열에 여러 번 추가되는 문제가 발생할 가능성이 존재
   }
 
   // 특정 주기로 메서드 실행
