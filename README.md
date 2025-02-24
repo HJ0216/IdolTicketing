@@ -120,11 +120,23 @@
 | **서버 엔진**       | Netty, Tomcat (Reactive 기반)    | Tomcat, Jetty (Servlet 기반)  |
 | **Backpressure**    | O                               | X                             |
 
+
 ## 3. 접속자 대기 시스템 개발
-### 3-1. 요구사항 분석
+[flow](https://github.com/HJ0216/IdolTicketing/tree/main/flow) 및 [website](https://github.com/HJ0216/IdolTicketing/tree/main/website) 프로젝트 참고
 
 
-
+## 4. 배운점
+1. Docker  
+* 정의: 리눅스 컨테이너 기술을 기반으로, 애플리케이션을 독립적이고 격리된 환경에서 실행할 수 있게 지원하는 플랫폼
+* 장점: 애플리케이션 실행에 필요한 모든 라이브러리와 설정을 이미지에 포함하여, 개발, 테스트, 운영 환경 간 일관성을 유지 → 환경 차이로 인한 오류를 줄임  
+도커의 가상화 방식은 새롭게 커널 OS를 생성하지 않고 호스트 OS의 커널 자원을 공유하여 사용 → 가볍고 효율적이며, 실행 속도가 빠름
+* 구성
+  * Docker Image: 컨테이너를 생성하기 위한 파일 시스템과 설정이 포함된 템플릿
+  * Docker Container: 이미지를 기반으로 생성된 독립적이고 격리된 실행 환경, 애플리케이션 실행에 필요한 라이브러리와 종속성 등을 포함하고 있음, 이미지를 기반으로 한 하나의 애플리케이션  
+  * Docker Volume: 내부 데이터를 컨테이너 외부에 저장할 수 있게 해주는 데이터 관리 방식(일반적으로 컨테이너에서 생긴 데이터들은 내부에서 관리되며 컨테이너가 삭제될 때 같이 삭제되지만, 볼륨을 사용하면 데이터는 컨테이너와 독립적으로 저장됨)
+  * Docker Network: 도커 컨테이너들이 서로 통신할 수 있게 해주는 가상 네트워크 시스템, 여러 컨테이너가 같은 네트워크 내에서 서로 통신할 수 있도록 관리
+* Docker Compose: 여러 개의 도커 컨테이너를 정의하고 실행하기 위한 도구  
+하나의 설정 파일로 여러 개의 컨테이너를 관리하고, 컨테이너 간의 네트워크 및 종속성을 설정하는 데 사용
 
 
 ### 📚참고자료
@@ -136,3 +148,5 @@
 [오픈소스 모니터링 시스템 Prometheus #1](https://blog.outsider.ne.kr/1254)  
 [Grafana란?](https://medium.com/finda-tech/grafana%EB%9E%80-f3c7c1551c38)  
 [[리액티브 프로그래밍] Backpressure의 개념과 Backpressure 전략](https://devfunny.tistory.com/914)
+[[docker란] 도커를 선택할 수 밖에 없는 이유](https://www.elancer.co.kr/blog/detail/757)
+
