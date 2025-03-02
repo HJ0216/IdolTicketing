@@ -183,7 +183,34 @@
   * 이전 명령의 결과를 다음 명령에서 사용할 수 없으므로 명령어 간 의존성이 있으면 사용하기 어려움
   * 모든 응답을 한 번에 받아야 하므로, 큰 데이터 처리는 주의
 
-
+3. 비기능 테스트(Non-functional Testing)
+* 종류
+![Non-functional-testing](https://github.com/user-attachments/assets/b9c650e0-9d0e-42bc-8067-f5b9e986fa01)
+  * 성능 테스트(Performance Test)
+    * *정의*: 특정 상황에서 시스템의 성능을 검증하는 테스트
+    * *목적*: 시스템의 응답 시간, 처리량, 자원 사용량, 확장성, 신뢰성 등을 검증
+  * 부하 테스트(Load Test)
+    * *정의*: 시스템에 점진적으로 부하(유저 수, 초당 API 요청 수, 데이터 처리량 등)를 증가시키면서 성능과 안정성을 검증하는 테스트
+    * *목적*: 시스템의 최대 처리량과 임계값 식별 및 성능 병목 구간 탐색
+  * 스트레스 테스트(Stress Test)
+    * *정의*: 정상적인 처리량을 초과하는 과부하를 가하여 시스템의 한계 및 복구 능력을 검증하는 테스트
+    * *목적*: 시스템의 복구 능력, 장애 대응 조치 수행 여부, 보안상의 문제 발생(서비스 거부 공격 등) 여부 등을 검증
+  * 내구성 테스트(Endurance Test)
+    * *정의*: 장시간 동안 지속적인 부하를 가하여 시스템의 안정성을 검증하는 테스트
+    * *목적*: 메모리 누수/자원 고갈 여부 확인, 장기 실행 시 성능 저하 여부 평가, CPU, 네트워크 사용량의 누적적 영향 등을 분석
+  * 스파이크 테스트(Spike Test)
+    * *정의*: 짧은 시간 동안 갑작스러운 높은 부하를 가하여 시스템의 반응성과 복구 능력을 검증
+    * *목적*: 대규모 트래픽이 순간적으로 유입될 때의 시스템의 처리 능력과 정상 상태로 복구 여부 등을 평가
+  * 확장성 테스트(Scalability Test)
+    * *정의*: 시스템이 증가하는 부하에 맞춰 확장될 수 있는지를 검증하는 테스트
+    * *목적*: 시스템이 수직적(스케일 업) 또는 수평적(스케일 아웃)으로 확장 가능한지 확인
+      * Scale-up: 스케일 업은 기존 서버의 사양을 업그레이드해 시스템을 확장하는 것
+      * Scale-out:  서버를 여러 대 추가하여 시스템을 확장하는 것
+  * 복구 테스트(Recovery Test)
+    * 장애 발생 후 시스템이 정상 상태로 복구되는지를 검증하는 테스트
+    * 장애 발생 시 자동 복구(예: 재시작, 페일오버 등)가 정상적으로 수행되는지 평가
+      * Failover: 컴퓨터 서버, 시스템, 네트워크 등에서 이상이 생겼을 때 예비 시스템으로 자동전환되는 기능
+      * Failback: Failover로 백업 서버에서 변경된 데이터를 동기화하고 장애가 발생하기 전의 본 서버로 되돌리는 기능
 
 
 
@@ -199,3 +226,6 @@
 [[docker란] 도커를 선택할 수 밖에 없는 이유](https://www.elancer.co.kr/blog/detail/757)
 [Spring Data Redis](https://spring.io/projects/spring-data-redis)
 [RedisRepository 및 RedisTemplate에 대해](https://velog.io/@eora21/RedisTemplate-%EB%B0%8F-RedisRepository%EC%97%90-%EB%8C%80%ED%95%B4)
+[성능테스트, 부하테스트, 스트레스 테스트..무엇이 다를까?](https://seongwon.dev/ETC/20220919-%EC%84%B1%EB%8A%A5%ED%85%8C%EC%8A%A4%ED%8A%B8-%EB%B6%80%ED%95%98%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8A%A4%ED%8A%B8%EB%A0%88%EC%8A%A4%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%9E%80/#reference)
+[성능 테스트, 부하 테스트, 스트레스 테스트 차이](https://dgjinsu.tistory.com/61)
+[성능 테스트 유형 알아보기](https://engineering-skcc.github.io/performancetest/Performance-Testing-Terminologies/)
