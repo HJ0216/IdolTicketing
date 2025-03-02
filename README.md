@@ -138,6 +138,54 @@
 * Docker Compose: 여러 개의 도커 컨테이너를 정의하고 실행하기 위한 도구  
 하나의 설정 파일로 여러 개의 컨테이너를 관리하고, 컨테이너 간의 네트워크 및 종속성을 설정하는 데 사용
 
+2. Spring Data Redis
+* 정의: Spring Data Redis provides easy configuration and access to Redis from Spring applications.
+* Drivers
+  * Lettuce
+    * a Netty-based open-source connector supported by Spring Data Redis
+    * 비동기(Async) 및 반응형(Reactive) 지원 → WebFlux, R2DBC와 함께 사용 가능
+    * Netty 기반의 효율적인 I/O 모델 → 높은 확장성
+      * Netty: 비동기, 이벤트 기반의 네트워크 프레임워크
+      * Java의 기본적인 I/O 방식(예: 블로킹 소켓)과 다르게, 비동기 방식으로 데이터 송수신을 처리  
+      네트워크 요청이 들어올 경우, 하나의 쓰레드가 모든 요청을 관리하는 것이 아니라 이벤트 루프(들어오는 요청을 이벤트 큐에 저장하고, 요청을 처리하는 동안 I/O 작업이 끝나길 기다리는 게 아니라, 다른 요청을 처리하고 있다가, 결과가 준비되면 콜백을 실행하는 방식)를 통해 처리
+    * Jedis보다 상대적으로 설정이 복잡하며 네이티브 Redis 명령어 지원이 일부 제한될 수 있음
+    * ***Spring WebFlux, R2DBC를 사용하는 경우 적합***
+  * Jedis: a community-driven connector supported by the Spring Data Redis module
+    * 사용이 간단하고 설정이 쉬움
+    * 블로킹 방식 → WebFlux 등과 함께 사용하기 어려움
+    * ***Spring MVC와 동기 방식이 필요한 경우 적합***
+* RedisTemplate
+  * 다양한 Redis 명령어를 쉽게 사용할 수 있도록 도와주는 템플릿 클래스
+  * String, Hash, List, Set, Sorted Set 등 다양한 Redis 데이터 타입을 지원
+  * Redis 명령어를 직접 호출할 수 있어, 캐시 TTL 설정, 트랜잭션 관리 등 상세한 조작 가능
+  * Redis는 기본적으로 byte[] 데이터를 저장하므로, (De)Serialization을 명확히 설정해야 함
+  * ***Redis의 다양한 데이터 구조를 활용하거나 세부적인 Redis 기능을 직접 컨트롤해야 할 때, WebFlux 환경에서 Reactive Redis를 사용하고 싶을 때 사용***
+* RedisRepository
+  * JpaRepository와 유사한 인터페이스 기반의 Redis 데이터 접근 방식을 제공
+  * Redis의 Hash 데이터 구조를 활용하여 기본적인 CRUD를 자동으로 처리할 수 있음
+  * RDB와 유사한 방식으로 데이터를 저장하고 관리하고 싶을 때 사용
+  * ***데이터를 Hash 구조로 저장하고 조회 성능을 최적화하고 싶을 때, Entity 스타일로 데이터를 저장하고 싶을 때 사용***
+* Cache
+  * 자주 사용하는 데이터를 미리 저장해두고 빠르게 가져오는 메모리 기반 저장소
+  * 메모리에 데이터를 저장하므로 디스크 I/O를 줄여 빠른 읽기/쓰기가 가능
+  * 각 캐시 항목마다 유효 기간을 설정할 수 있어, 일정 시간이 지나면 자동으로 삭제되어 메모리 관리를 도와줌
+  * ***적합한 사용 사례***
+    * 자주 조회되는 데이터 캐싱
+    * 세션 관리
+    * 실시간 데이터 처리
+    * 부하 분산
+  * 주의 사항
+    * 캐시와 실제 데이터베이스 사이의 데이터 일관성을 맞추기 위한 적절한 캐시 무효화 전략이 필요
+    * 서버가 재부팅되거나 Redis 프로세스가 비정상 종료되면 데이터가 유실될 위험이 존재
+* Pipelining
+  * 여러 개의 Redis 명령어를 한 번에 전송하여 성능을 향상시키는 기능
+  * 기본적으로 Redis는 클라이언트가 하나의 요청을 보내고 응답을 받은 후 다음 요청을 보내는 방식(요청-응답 패턴)으로 동작하지만, Pipeline을 사용하면 여러 개의 명령을 한 번에 전송하고, Redis가 처리한 후 한꺼번에 응답을 받을 수 있음
+  * 이전 명령의 결과를 다음 명령에서 사용할 수 없으므로 명령어 간 의존성이 있으면 사용하기 어려움
+  * 모든 응답을 한 번에 받아야 하므로, 큰 데이터 처리는 주의
+
+
+
+
 
 ### 📚참고자료
 [9개 프로젝트로 경험하는 대용량 트래픽 & 데이터 처리 초격차 패키지 Online](https://fastcampus.co.kr/dev_online_traffic_data)  
@@ -149,4 +197,5 @@
 [Grafana란?](https://medium.com/finda-tech/grafana%EB%9E%80-f3c7c1551c38)  
 [[리액티브 프로그래밍] Backpressure의 개념과 Backpressure 전략](https://devfunny.tistory.com/914)
 [[docker란] 도커를 선택할 수 밖에 없는 이유](https://www.elancer.co.kr/blog/detail/757)
-
+[Spring Data Redis](https://spring.io/projects/spring-data-redis)
+[RedisRepository 및 RedisTemplate에 대해](https://velog.io/@eora21/RedisTemplate-%EB%B0%8F-RedisRepository%EC%97%90-%EB%8C%80%ED%95%B4)
