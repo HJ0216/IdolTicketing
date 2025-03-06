@@ -245,6 +245,47 @@
 ##### 메트릭(metric): 측정 가능한 시스템의 성능 지표로 서버, 데이터베이스, 애플리케이션의 상태를 숫자로 나타낸 값 <br/> (예: CPU 사용률: 70%, 메모리 사용량: 8GB, Redis 요청 수: 5,000 req/sec, DB 쿼리 응답 속도: 10ms)
 ##### Push 방식: 각 서버에 에이전트를 설치하여 모니터링 서버로 데이터를 전송하는 방식
 
+5. Spring WebFlux vs MVC
+* Spring WebFlux
+  * 비동기 논블로킹 방식의 Reactive Programming을 지원하는 Spring Framework의 모듈
+  * Reactor(Core) 라이브러리의 Flux와 Mono를 활용하여 데이터를 비동기 스트림으로 처리
+  * 특징
+    * 비동기/논블로킹: 요청과 응답이 독립적으로 처리
+    * 리액티브 스트림 기반: Publisher-Subscriber 패턴 활용
+      * Publisher: 데이터를 한 번에 다 주는 게 아니라 필요할 때마다 Mono<T>, Flux<T> 형태로 제공
+      * Subscriber: Publisher로부터 데이터를 비동기적으로 받아서 처리
+    * **Netty**, Undertow, Tomcat 등 지원
+    * Backpressure 지원: Publisher가 끊임없이 emit하는 무수히 많은 데이터를 적절하게 제어하여 데이터 처리에 과부하가 걸리지 않도록 제어
+    * WebFlux는 높은 동시성을 제공하지만, 단순한 CRUD API에서는 MVC보다 성능이 낮을 수 있음 (스레드 컨텍스트 스위칭 비용 발생)
+    * 실시간 데이터 처리(예: 채팅, IoT)에 주로 사용
+* Spring MVC
+  * **Servlet** 기반의 동기 요청-응답 처리 모델  
+  각 요청이 Servlet 스레드 풀에서 하나의 스레드를 점유하며, 응답이 완료될 때까지 해당 스레드는 블로킹됨
+  * 특징
+    * 동기식 처리: 요청과 응답이 1:1로 매핑되어 순차적으로 처리
+    * **Tomcat** (Servlet 기반) 지원
+    * Servlet API 기반: DispatcherServlet을 중심으로 작동
+    * 전통적인 REST API와 CRUD 시스템에서 주로 사용
+ 
+ <br/>
+
+**Spring WebFlux vs Spring MVC 비교**
+
+| 항목                | Spring WebFlux                  | Spring MVC                    |
+|---------------------|---------------------------------|------------------------------|
+| **요청 처리 방식**   | 비동기/논블로킹                  | 동기/블로킹                    |
+| **멀티스레드 모델**  | **이벤트 루프** 기반             | Servlet 스레드 풀 기반           |
+| **데이터 처리 방식** | 리액티브 스트림 (`Flux`, `Mono`) | 일반적인 `List`, `Map` 반환    |
+| **적합한 사용 사례** | 실시간 데이터, 스트리밍, IoT 등   | CRUD 서비스, 전통적인 REST API |
+| **서버 엔진**       | Netty, Tomcat (Reactive 기반)    | Tomcat, Jetty (Servlet 기반)  |
+| **Backpressure**    | O                               | X                             |
+
+##### Netty: 비동기, 이벤트 기반의 네트워크 프레임워크
+##### Tomcat: Java Servlet과 JSP(HTML 내에 Java 코드를 삽입하여 동적으로 웹 페이지를 생성할 수 있도록 하는 기술)를 실행하는 동기 기반의 서블릿 컨테이너
+##### Servlet: Java에서 웹 요청과 응답을 처리하기 위한 표준 인터페이스 및 API로 동기 요청-응답 처리 방식
+##### Servlet Container: Servlet을 실행하고 요청을 처리하는 서버 환경(Servlet의 실행 및 생명주기(생성, 초기화, 요청 처리, 종료 등)를 관리)
+##### Event Loop: 들어오는 요청을 이벤트 큐에 저장하고, 요청을 처리하는 동안 I/O 작업이 끝나길 기다리는 게 아니라, 다른 요청을 처리하고 있다가, 결과가 준비되면 콜백을 실행하는 방식
+
 
 
 ### 📚참고자료
