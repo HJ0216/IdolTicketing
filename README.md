@@ -138,6 +138,8 @@
 * Docker Compose: 여러 개의 도커 컨테이너를 정의하고 실행하기 위한 도구  
 하나의 설정 파일로 여러 개의 컨테이너를 관리하고, 컨테이너 간의 네트워크 및 종속성을 설정하는 데 사용
 
+<br/>
+
 2. Spring Data Redis
 * 정의: Spring Data Redis provides easy configuration and access to Redis from Spring applications.
 * Drivers
@@ -191,6 +193,8 @@
     * 읽기 부하 분산: 마스터 서버에 대한 읽기 요청을 슬레이브 서버로 분산시킬 수 있음  
     → 여러 개의 슬레이브 서버를 운영하여 읽기 부하를 분산시킴으로써 성능을 개선하고, 대규모 트래픽을 처리할 수도 있음
 
+<br/>
+
 3. 비기능 테스트(Non-functional Testing)
 * 종류
 ![Non-functional-testing](https://github.com/user-attachments/assets/b9c650e0-9d0e-42bc-8067-f5b9e986fa01)
@@ -220,6 +224,8 @@
       * Failover: 컴퓨터 서버, 시스템, 네트워크 등에서 이상이 생겼을 때 예비 시스템으로 자동전환되는 기능
       * Failback: Failover로 백업 서버에서 변경된 데이터를 동기화하고 장애가 발생하기 전의 본 서버로 되돌리는 기능
 
+<br/>
+
 4. 모니터링: Prometheus와 Grafana
 * Monitoring
   * *정의*: 시스템의 상태를 지속적으로 관찰하고 측정하는 과정
@@ -244,6 +250,8 @@
 ##### 시계열 데이터베이스: 시간을 기반으로 하는 데이터(메트릭, 로그, 이벤트 등)를 저장하고 빠르게 조회할 수 있는 DB 종류
 ##### 메트릭(metric): 측정 가능한 시스템의 성능 지표로 서버, 데이터베이스, 애플리케이션의 상태를 숫자로 나타낸 값 <br/> (예: CPU 사용률: 70%, 메모리 사용량: 8GB, Redis 요청 수: 5,000 req/sec, DB 쿼리 응답 속도: 10ms)
 ##### Push 방식: 각 서버에 에이전트를 설치하여 모니터링 서버로 데이터를 전송하는 방식
+
+<br/>
 
 5. Spring WebFlux vs MVC
 * Spring WebFlux
@@ -286,9 +294,37 @@
 ##### Servlet Container: Servlet을 실행하고 요청을 처리하는 서버 환경(Servlet의 실행 및 생명주기(생성, 초기화, 요청 처리, 종료 등)를 관리)
 ##### Event Loop: 들어오는 요청을 이벤트 큐에 저장하고, 요청을 처리하는 동안 I/O 작업이 끝나길 기다리는 게 아니라, 다른 요청을 처리하고 있다가, 결과가 준비되면 콜백을 실행하는 방식
 
+<br/>
+
+6. 기타
+* Enum을 활용한 ErrorCode
+  ```java
+  @AllArgsConstructor
+  public enum ErrorCode {
+    QUEUE_ALREADY_REGISTERED_USER_IN_QUEUE(HttpStatus.CONFLICT, "UQ-0002", "Already Registered in Queue-%s");
+
+    private final HttpStatus status;
+    private final String code;
+    private final String reason;
+
+    public ApplicationException build(Object ...args){
+      return new ApplicationException(status, code, reason.formatted(args));
+    }
+  }
+  ```
+* record 타입
+  * 불변(immutable) 데이터 객체를 간단하게 정의하기 위한 새로운 클래스 유형으로, Java 16부터 정식 기능으로 사용
+  * getter, toString(), equals(), hashCode() 등을 자동으로 생성
+  * 데이터 전달용 객체(DTO)나 불변 객체를 만들 때 사용
+* Scheduling
+  * @Scheduled 어노테이션을 활용하여 별도의 외부 라이브러리 없이, 특정 시간마다 작업을 실행하는 배치 작업을 간단하게 설정할 수 있음
+
+<br/>
+
 
 
 ### 📚참고자료
+---
 [9개 프로젝트로 경험하는 대용량 트래픽 & 데이터 처리 초격차 패키지 Online](https://fastcampus.co.kr/dev_online_traffic_data)  
 [Redis란 무엇일까? - Redis의 특징과 사용 시 주의점](https://velog.io/@wnguswn7/Redis%EB%9E%80-%EB%AC%B4%EC%97%87%EC%9D%BC%EA%B9%8C-Redis%EC%9D%98-%ED%8A%B9%EC%A7%95%EA%B3%BC-%EC%82%AC%EC%9A%A9-%EC%8B%9C-%EC%A3%BC%EC%9D%98%EC%A0%90)  
 [[Redis] 레디스 알고 쓰자. - 정의, 저장방식, 아키텍처, 자료구조, 유효 기간](https://velog.io/@banggeunho/%EB%A0%88%EB%94%94%EC%8A%A4Redis-%EC%95%8C%EA%B3%A0-%EC%93%B0%EC%9E%90.-%EC%A0%95%EC%9D%98-%EC%A0%80%EC%9E%A5%EB%B0%A9%EC%8B%9D-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-%EC%9E%90%EB%A3%8C%EA%B5%AC%EC%A1%B0-%EC%9C%A0%ED%9A%A8-%EA%B8%B0%EA%B0%84)  
@@ -296,10 +332,10 @@
 [프로메테우스(소프트웨어)](https://en.wikipedia.org/wiki/Prometheus_(software))  
 [오픈소스 모니터링 시스템 Prometheus #1](https://blog.outsider.ne.kr/1254)  
 [Grafana란?](https://medium.com/finda-tech/grafana%EB%9E%80-f3c7c1551c38)  
-[[리액티브 프로그래밍] Backpressure의 개념과 Backpressure 전략](https://devfunny.tistory.com/914)
-[[docker란] 도커를 선택할 수 밖에 없는 이유](https://www.elancer.co.kr/blog/detail/757)
-[Spring Data Redis](https://spring.io/projects/spring-data-redis)
-[RedisRepository 및 RedisTemplate에 대해](https://velog.io/@eora21/RedisTemplate-%EB%B0%8F-RedisRepository%EC%97%90-%EB%8C%80%ED%95%B4)
-[성능테스트, 부하테스트, 스트레스 테스트..무엇이 다를까?](https://seongwon.dev/ETC/20220919-%EC%84%B1%EB%8A%A5%ED%85%8C%EC%8A%A4%ED%8A%B8-%EB%B6%80%ED%95%98%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8A%A4%ED%8A%B8%EB%A0%88%EC%8A%A4%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%9E%80/#reference)
-[성능 테스트, 부하 테스트, 스트레스 테스트 차이](https://dgjinsu.tistory.com/61)
-[성능 테스트 유형 알아보기](https://engineering-skcc.github.io/performancetest/Performance-Testing-Terminologies/)
+[[리액티브 프로그래밍] Backpressure의 개념과 Backpressure 전략](https://devfunny.tistory.com/914)  
+[[docker란] 도커를 선택할 수 밖에 없는 이유](https://www.elancer.co.kr/blog/detail/757)  
+[Spring Data Redis](https://spring.io/projects/spring-data-redis)  
+[RedisRepository 및 RedisTemplate에 대해](https://velog.io/@eora21/RedisTemplate-%EB%B0%8F-RedisRepository%EC%97%90-%EB%8C%80%ED%95%B4)  
+[성능테스트, 부하테스트, 스트레스 테스트..무엇이 다를까?](https://seongwon.dev/ETC/20220919-%EC%84%B1%EB%8A%A5%ED%85%8C%EC%8A%A4%ED%8A%B8-%EB%B6%80%ED%95%98%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%8A%A4%ED%8A%B8%EB%A0%88%EC%8A%A4%ED%85%8C%EC%8A%A4%ED%8A%B8%EB%9E%80/#reference)  
+[성능 테스트, 부하 테스트, 스트레스 테스트 차이](https://dgjinsu.tistory.com/61)  
+[성능 테스트 유형 알아보기](https://engineering-skcc.github.io/performancetest/Performance-Testing-Terminologies/)  
